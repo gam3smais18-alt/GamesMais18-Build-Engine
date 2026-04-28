@@ -8,26 +8,28 @@ jobs:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Preparando Hangar e Python
+      - name: 2. Preparando Hangar
         run: |
-          sudo apt-get update && sudo apt-get install -y unzip python3-pip
-          # Instalando a peça que faltava para o Ren'Py abrir
-          python3 -m pip install future
-          echo "Hangar e bibliotecas prontos."
+          sudo apt-get update && sudo apt-get install -y unzip libglu1 libpulse0
+          echo "Hangar pronto."
 
       - name: 3. Instalando Motor e RAPT
         run: |
+          # Baixando SDK
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
+          # Baixando RAPT
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
           unzip -q renpy-8.2.1-rapt.zip
           mv rapt* renpy_sdk/rapt
 
       - name: 4. Cuspindo Código (O SHOW COMEÇA AQUI)
         run: |
-          # Agora com a biblioteca 'future', o comando vai voar
-          python3 renpy_sdk/renpy.py renpy_sdk/launcher distribute . --destination build_output --platforms android
+          # Dando permissão de execução para o motor
+          chmod +x renpy_sdk/renpy.sh
+          # Usando o lançador nativo para evitar erro de bibliotecas
+          ./renpy_sdk/renpy.sh launcher distribute . --destination build_output --platforms android
 
       - name: 5. Entrega da Carga
         uses: actions/upload-artifact@v4
