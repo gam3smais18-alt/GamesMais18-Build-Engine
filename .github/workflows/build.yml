@@ -8,10 +8,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout do Código
+        uses: actions/checkout@v4
 
       - name: Fabricando APK e RPA
-        uses: Magi-Corporation/renpy-build-action@v1
+        uses: Ayowel/renpy-build-action@v1.4.0
         with:
           platform: android
           project-dir: .
