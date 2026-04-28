@@ -1,22 +1,32 @@
-name: Bypass G18
+name: Compilacao_Manual_G18
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ayowel/renpy:8.2.1 # Aqui usamos a imagem direto, sem passar pelo link quebrado
     steps:
-      - name: Sincronizando Projeto
+      - name: 1. Pegando seus arquivos
         uses: actions/checkout@v4
 
-      - name: Cuspindo Código (Terminal Vivo)
-        run: |
-          echo "Iniciando Compilação Manual..."
-          # Este comando vai fazer o terminal 'cuspir' tudo na sua tela
-          /renpy/renpy.sh . distribute --destination build_output --platforms android
+      - name: 2. Instalando Java (Necessário para Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Entrega do APK
+      - name: 3. Baixando Motor Ren'Py Oficial
+        run: |
+          wget https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
+          tar xf renpy-8.2.1-sdk.tar.bz2
+          mv renpy-8.2.1-sdk renpy_sdk
+
+      - name: 4. Cuspindo Código (O Terminal Vivo)
+        run: |
+          # Aqui o terminal vai mostrar cada passo da criação do APK
+          ./renpy_sdk/renpy.sh . distribute --destination build_output --platforms android
+
+      - name: 5. Entrega do APK
         uses: actions/upload-artifact@v4
         with:
-          name: APK-Gerado-G18
+          name: APK_Final_G18
           path: build_output/*.apk
