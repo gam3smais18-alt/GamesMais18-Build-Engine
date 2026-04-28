@@ -1,40 +1,44 @@
-name: Forca_Bruta_G18_V5
+name: Forca_Bruta_G18_V6
 on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Furando a fila do GitHub novamente
+    runs-on: ubuntu-22.04
     steps:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Preparando Hangar (Java + Tela Virtual)
+      - name: 2. Instalando o Java 21 (A Exigência do Ren'Py)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21' # AQUI ESTÁ A MÁGICA: O Ren'Py pediu 21, nós damos 21!
+
+      - name: 3. Preparando Hangar (Tela Virtual)
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip openjdk-17-jdk xvfb libglu1 libpulse0 libasound2
+          # Tiramos o Java antigo daqui e deixamos só o simulador de tela
+          sudo apt-get install -y unzip xvfb libglu1 libpulse0 libasound2
           echo "Hangar pronto."
 
-      - name: 3. Instalando Motor e RAPT (O Jeito Blindado)
+      - name: 4. Instalando Motor e RAPT
         run: |
-          # Baixando o Motor
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
           
-          # Baixando o RAPT
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
           unzip -q renpy-8.2.1-rapt.zip
           mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 4. Cuspindo Código (SEM INVENTAR COMANDO)
+      - name: 5. Cuspindo Código (O SHOW DE VERDADE)
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
-          # O "yes |" responde "sim" para qualquer termo de uso do Android.
-          # Removemos o "--install-sdk" que deu erro.
+          # O comando que funcionou perfeitamente, agora com o Java certo
           yes | xvfb-run ./renpy_sdk/renpy.sh renpy_sdk/launcher android_build . --destination $GITHUB_WORKSPACE/build_output
 
-      - name: 5. Entrega da Carga
+      - name: 6. Entrega da Carga
         uses: actions/upload-artifact@v4
         with:
           name: APK_Final_G18
