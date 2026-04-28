@@ -10,24 +10,29 @@ jobs:
 
       - name: 2. Preparando Hangar
         run: |
-          # Instalando o que o Android precisa para "nascer"
           sudo apt-get update && sudo apt-get install -y unzip libglu1 libpulse0 libasound2
           echo "Hangar pronto."
 
-      - name: 3. Instalando Motor e RAPT
+      - name: 3. Instalando Motor e RAPT (Ajuste de Pastas)
         run: |
+          # Baixando e instalando o SDK principal
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
+          
+          # Baixando o RAPT (Ferramenta Android)
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
           unzip -q renpy-8.2.1-rapt.zip
-          mv rapt* renpy_sdk/rapt
+          
+          # AQUI ESTÁ O SEGREDO: Movendo o CONTEÚDO para a pasta certa
+          mkdir -p renpy_sdk/rapt
+          cp -r renpy-8.2.1-rapt/* renpy_sdk/rapt/
 
-      - name: 4. Cuspindo Código (A HORA DO APK)
+      - name: 4. Cuspindo Código (AGORA O APK SAI)
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
-          # USANDO O COMANDO CERTO PARA ANDROID NO REN'PY 8
+          # Usando o comando oficial para compilar o projeto atual (.) para Android
           ./renpy_sdk/renpy.sh . android_build --destination build_output
 
       - name: 5. Entrega da Carga
