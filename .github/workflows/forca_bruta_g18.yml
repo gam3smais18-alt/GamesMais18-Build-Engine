@@ -10,7 +10,7 @@ jobs:
 
       - name: 2. Preparando Hangar
         run: |
-          # Instalando bibliotecas que o motor do Ren'Py usa para "pensar"
+          # Instalando o que o Android precisa para "nascer"
           sudo apt-get update && sudo apt-get install -y unzip libglu1 libpulse0 libasound2
           echo "Hangar pronto."
 
@@ -23,13 +23,12 @@ jobs:
           unzip -q renpy-8.2.1-rapt.zip
           mv rapt* renpy_sdk/rapt
 
-      - name: 4. Cuspindo Código (O SHOW COMEÇA AGORA)
+      - name: 4. Cuspindo Código (A HORA DO APK)
         run: |
-          # Criando a pasta de saída para não dar erro
           mkdir -p build_output
-          # Dando permissão e rodando o comando no local certo (.)
           chmod +x renpy_sdk/renpy.sh
-          ./renpy_sdk/renpy.sh . distribute --destination build_output --platforms android
+          # USANDO O COMANDO CERTO PARA ANDROID NO REN'PY 8
+          ./renpy_sdk/renpy.sh . android_build --destination build_output
 
       - name: 5. Entrega da Carga
         uses: actions/upload-artifact@v4
