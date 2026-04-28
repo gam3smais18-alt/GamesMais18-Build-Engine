@@ -3,29 +3,29 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Mudando a versão para tentar furar a fila
     steps:
-      - name: 1. Pegando seus arquivos
+      - name: 1. Sincronizando
         uses: actions/checkout@v4
 
-      - name: 2. Instalando Java
+      - name: 2. Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 3. Baixando Motor Ren'Py Oficial
+      - name: 3. Baixando Ren'Py (Direto)
         run: |
-          wget https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
+          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
 
-      - name: 4. Cuspindo Código (O Terminal)
+      - name: 4. Cuspindo Código (Terminal)
         run: |
           ./renpy_sdk/renpy.sh . distribute --destination build_output --platforms android
 
-      - name: 5. Entrega do APK
+      - name: 5. Entrega
         uses: actions/upload-artifact@v4
         with:
-          name: APK_GamesMais18
+          name: APK_Final
           path: build_output/*.apk
