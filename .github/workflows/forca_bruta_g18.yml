@@ -1,37 +1,41 @@
-name: Gerador_APK_GamesMais18
+name: Forca_Bruta_G18_V5
 on: [push]
-
-env:
-  # Isso é crucial: desliga o Android padrão do GitHub para não dar conflito com o do Ren'Py
-  ANDROID_NDK_HOME: ""
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Furando a fila do GitHub novamente
     steps:
-      - name: 1. Pegando os arquivos do Mod
+      - name: 1. Pegando arquivos
         uses: actions/checkout@v4
-        with:
-          path: projeto_g18 # Isola o seu jogo numa pasta limpa
 
-      - name: 2. Instalando o Java (Coração do Android)
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+      - name: 2. Preparando Hangar (Java + Tela Virtual)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip openjdk-17-jdk xvfb libglu1 libpulse0 libasound2
+          echo "Hangar pronto."
 
-      - name: 3. Construindo o APK (O Plugin Oficial)
-        uses: Ayowel/renpy-setup-action@v2.0.1
-        with:
-          action: android_build
-          install_dir: motor_renpy
-          game: projeto_g18
-          out_dir: build_output
-          android_sdk: true
-          android_sdk_owner: "GamesMais18"
+      - name: 3. Instalando Motor e RAPT (O Jeito Blindado)
+        run: |
+          # Baixando o Motor
+          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
+          tar xf renpy-8.2.1-sdk.tar.bz2
+          mv renpy-8.2.1-sdk renpy_sdk
+          
+          # Baixando o RAPT
+          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
+          unzip -q renpy-8.2.1-rapt.zip
+          mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 4. Entrega da Carga
+      - name: 4. Cuspindo Código (SEM INVENTAR COMANDO)
+        run: |
+          mkdir -p build_output
+          chmod +x renpy_sdk/renpy.sh
+          # O "yes |" responde "sim" para qualquer termo de uso do Android.
+          # Removemos o "--install-sdk" que deu erro.
+          yes | xvfb-run ./renpy_sdk/renpy.sh renpy_sdk/launcher android_build . --destination $GITHUB_WORKSPACE/build_output
+
+      - name: 5. Entrega da Carga
         uses: actions/upload-artifact@v4
         with:
-          name: APK_GamesMais18_Final
-          path: build_output
+          name: APK_Final_G18
+          path: build_output/*.apk
