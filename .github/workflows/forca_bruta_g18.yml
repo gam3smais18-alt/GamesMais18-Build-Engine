@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_V11
+name: Forca_Bruta_G18_Definitivo
 on: [push]
 
 jobs:
@@ -8,20 +8,26 @@ jobs:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Instalando o Java 21
+      - name: 2. Criando Memória Virtual (A Cura para o Erro de Daemon)
+        run: |
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          echo "Memória RAM Expandida com Sucesso:"
+          free -h
+
+      - name: 3. Instalando Java 21 e Bibliotecas
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: 3. Preparando Hangar
+      - name: 4. Baixando Motor e Preparando Hangar
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip xvfb libglu1 libpulse0 libasound2
-          echo "Hangar pronto."
-
-      - name: 4. Instalando Motor e RAPT
-        run: |
+          
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
@@ -30,7 +36,7 @@ jobs:
           unzip -q renpy-8.2.1-rapt.zip
           mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 5. Criando Identidade
+      - name: 5. Criando a Identidade do APK
         run: |
           cat <<EOF > android.json
           {
@@ -46,11 +52,9 @@ jobs:
           }
           EOF
 
-      - name: 6. Cuspindo Código (MODO BLINDADO)
+      - name: 6. Compilando o APK (Sem Quedas)
         env:
-          # Isso PROÍBE o Android de criar os "daemons" (processos fantasmas que estouram a RAM)
-          # E limita o processo único a 2GB seguros.
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx2048m -XX:MaxMetaspaceSize=512m"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx3g"
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
