@@ -1,0 +1,31 @@
+name: Terminal_Vivo_G18
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Pegando seus arquivos
+        uses: actions/checkout@v4
+
+      - name: 2. Instalando Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 3. Baixando Motor Ren'Py Oficial
+        run: |
+          wget https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
+          tar xf renpy-8.2.1-sdk.tar.bz2
+          mv renpy-8.2.1-sdk renpy_sdk
+
+      - name: 4. Cuspindo Código (O Terminal)
+        run: |
+          ./renpy_sdk/renpy.sh . distribute --destination build_output --platforms android
+
+      - name: 5. Entrega do APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: APK_GamesMais18
+          path: build_output/*.apk
