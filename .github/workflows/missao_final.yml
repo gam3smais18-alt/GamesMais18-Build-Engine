@@ -1,24 +1,15 @@
-name: Missao Final G18
-on:
-  push:
-    branches: [ "main" ]
+name: Vitoria_G18_V3
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Sincronizando Projeto
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Terminal em Tempo Real
-        uses: Ayowel/renpy-build-action@v1.4.0
+      - name: TERMINAL_VIVO
+        uses: "Ayowel/renpy-build-action@v1.5.1"
         with:
           platform: android
           project-dir: .
           output-dir: build_output
-
-      - name: Gerando APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mod-GamesMais18
-          path: build_output/*.apk
