@@ -1,15 +1,22 @@
-name: Vitoria_G18_V3
+name: Bypass G18
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: ayowel/renpy:8.2.1 # Aqui usamos a imagem direto, sem passar pelo link quebrado
     steps:
-      - uses: actions/checkout@v4
+      - name: Sincronizando Projeto
+        uses: actions/checkout@v4
 
-      - name: TERMINAL_VIVO
-        uses: "Ayowel/renpy-build-action@v1.5.1"
+      - name: Cuspindo Código (Terminal Vivo)
+        run: |
+          echo "Iniciando Compilação Manual..."
+          # Este comando vai fazer o terminal 'cuspir' tudo na sua tela
+          /renpy/renpy.sh . distribute --destination build_output --platforms android
+
+      - name: Entrega do APK
+        uses: actions/upload-artifact@v4
         with:
-          platform: android
-          project-dir: .
-          output-dir: build_output
+          name: APK-Gerado-G18
+          path: build_output/*.apk
