@@ -1,0 +1,24 @@
+name: Decolagem G18
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sincronizando Arquivos
+        uses: actions/checkout@v4
+
+      - name: Fabricando APK (Terminal Vivo)
+        uses: Ayowel/renpy-build-action@v1.4.0
+        with:
+          platform: android
+          project-dir: .
+          output-dir: build_output
+
+      - name: Entrega da Carga
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mod-Pronto-G18
+          path: build_output/*.apk
