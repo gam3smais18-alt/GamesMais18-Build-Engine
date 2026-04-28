@@ -41,9 +41,12 @@ define gui.show_name = False
 
 define config.version = "0.102"
 
-android.permission.READ_EXTERNAL_STORAGE
-android.permission.WRITE_EXTERNAL_STORAGE
-android.permission.MANAGE_EXTERNAL_STORAGE
+## Permissões de Android corrigidas
+define build.android_permissions = [
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.WRITE_EXTERNAL_STORAGE",
+    "android.permission.MANAGE_EXTERNAL_STORAGE",
+]
 
 
 ## Text that is placed on the game's about screen. Place the text between the
