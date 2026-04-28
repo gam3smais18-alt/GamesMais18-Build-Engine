@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_Definitivo_V3
+name: Forca_Bruta_G18_Definitivo_V4
 on: [push]
 
 jobs:
@@ -8,17 +8,16 @@ jobs:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Criando Memória Virtual (O Nome Certo)
+      - name: 2. Criando Memória Virtual (O Tanque de Oxigênio)
         run: |
-          # O segredo: mudamos o nome para /swapfile_extra para não bater de frente com o sistema
           sudo fallocate -l 8G /swapfile_extra
           sudo chmod 600 /swapfile_extra
           sudo mkswap /swapfile_extra
           sudo swapon /swapfile_extra
-          echo "Memória RAM Expandida com Sucesso. Olha o tamanho do tanque agora:"
+          echo "Tanque de memória extra ativado:"
           free -h
 
-      - name: 3. Instalando Java 21 e Bibliotecas
+      - name: 3. Instalando Java 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -41,10 +40,10 @@ jobs:
         run: |
           cat <<EOF > android.json
           {
-              "name": "Games Mais 18",
-              "icon_name": "Games Mais 18",
-              "package": "com.gam3smais18.mod",
-              "version": "1.0",
+              "name": "Grandmas House",
+              "icon_name": "Grandmas House",
+              "package": "gm18.grandmashouse",
+              "version": "0.102",
               "numeric_version": 1,
               "orientation": "sensorLandscape",
               "update_keystore": false,
@@ -53,9 +52,13 @@ jobs:
           }
           EOF
 
-      - name: 6. Compilando o APK (Com RAM de Sobra)
+      - name: 6. Compilando o APK (Fila Indiana Segura)
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx3g"
+          # A FÓRMULA MÁGICA PARA JOGOS PESADOS:
+          # -Dorg.gradle.parallel=false (Desliga o modo apressado)
+          # -Dorg.gradle.workers.max=1 (Usa apenas 1 trabalhador para não estourar a RAM)
+          # -Xmx4g (Libera 4GB limpos de RAM + o Swap)
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.workers.max=1 -Xmx4g"
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
