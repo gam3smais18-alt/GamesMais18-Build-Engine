@@ -5,30 +5,33 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: 1. Sincronizando
+      - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
       - name: 2. Preparando Hangar
         run: |
           sudo apt-get update && sudo apt-get install -y unzip
-          echo "Hangar pronto e limpo."
+          echo "Hangar pronto."
 
-      - name: 3. Baixando Motor e RAPT
+      - name: 3. Instalando Motor e RAPT (Ajustado)
         run: |
+          # Baixando SDK
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
+          # Baixando RAPT
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
           unzip -q renpy-8.2.1-rapt.zip
-          mv renpy-8.2.1-rapt renpy_sdk/rapt
+          # Comando Coringa: Move qualquer pasta que comece com 'rapt'
+          mv rapt* renpy_sdk/rapt
 
-      - name: 4. Cuspindo Código (O Terminal Vivo)
+      - name: 4. Cuspindo Código (O SHOW COMEÇA AQUI)
         run: |
-          # Usando o comando do launcher que corrigimos
+          # Comando mestre para Ren'Py 8
           python3 renpy_sdk/renpy.py renpy_sdk/launcher distribute . --destination build_output --platforms android
 
       - name: 5. Entrega da Carga
         uses: actions/upload-artifact@v4
         with:
-          name: APK_Final_G18
+          name: APK_Final_GamesMais18
           path: build_output/*.apk
