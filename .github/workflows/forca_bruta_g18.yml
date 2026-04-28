@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_Definitivo_V2
+name: Forca_Bruta_G18_Definitivo_V3
 on: [push]
 
 jobs:
@@ -8,14 +8,14 @@ jobs:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Criando Memória Virtual (Escrita Forçada com DD)
+      - name: 2. Criando Memória Virtual (O Nome Certo)
         run: |
-          # Usando o comando DD para gravar 8GB à força no disco
-          sudo dd if=/dev/zero of=/swapfile bs=1M count=8192
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
-          echo "Memória RAM Expandida com Sucesso:"
+          # O segredo: mudamos o nome para /swapfile_extra para não bater de frente com o sistema
+          sudo fallocate -l 8G /swapfile_extra
+          sudo chmod 600 /swapfile_extra
+          sudo mkswap /swapfile_extra
+          sudo swapon /swapfile_extra
+          echo "Memória RAM Expandida com Sucesso. Olha o tamanho do tanque agora:"
           free -h
 
       - name: 3. Instalando Java 21 e Bibliotecas
