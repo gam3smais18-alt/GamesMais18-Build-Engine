@@ -1,4 +1,4 @@
-name: Compilação Orbital G18
+name: Compilação Orbital G18 v2
 on: [push]
 jobs:
   build:
