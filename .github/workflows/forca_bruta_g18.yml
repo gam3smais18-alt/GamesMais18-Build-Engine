@@ -1,0 +1,34 @@
+name: Forca_Bruta_G18
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: 1. Sincronizando
+        uses: actions/checkout@v4
+
+      - name: 2. Preparando Hangar
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip
+          echo "Hangar pronto e limpo."
+
+      - name: 3. Baixando Motor e RAPT
+        run: |
+          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
+          tar xf renpy-8.2.1-sdk.tar.bz2
+          mv renpy-8.2.1-sdk renpy_sdk
+          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
+          unzip -q renpy-8.2.1-rapt.zip
+          mv renpy-8.2.1-rapt renpy_sdk/rapt
+
+      - name: 4. Cuspindo Código (O Terminal Vivo)
+        run: |
+          # Usando o comando do launcher que corrigimos
+          python3 renpy_sdk/renpy.py renpy_sdk/launcher distribute . --destination build_output --platforms android
+
+      - name: 5. Entrega da Carga
+        uses: actions/upload-artifact@v4
+        with:
+          name: APK_Final_G18
+          path: build_output/*.apk
