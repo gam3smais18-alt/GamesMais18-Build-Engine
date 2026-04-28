@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_Definitivo
+name: Forca_Bruta_G18_Definitivo_V2
 on: [push]
 
 jobs:
@@ -8,9 +8,10 @@ jobs:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Criando Memória Virtual (A Cura para o Erro de Daemon)
+      - name: 2. Criando Memória Virtual (Escrita Forçada com DD)
         run: |
-          sudo fallocate -l 8G /swapfile
+          # Usando o comando DD para gravar 8GB à força no disco
+          sudo dd if=/dev/zero of=/swapfile bs=1M count=8192
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
@@ -52,7 +53,7 @@ jobs:
           }
           EOF
 
-      - name: 6. Compilando o APK (Sem Quedas)
+      - name: 6. Compilando o APK (Com RAM de Sobra)
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx3g"
         run: |
