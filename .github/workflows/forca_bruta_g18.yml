@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_V6
+name: Forca_Bruta_G18_V7
 on: [push]
 
 jobs:
@@ -8,16 +8,15 @@ jobs:
       - name: 1. Pegando arquivos
         uses: actions/checkout@v4
 
-      - name: 2. Instalando o Java 21 (A Exigência do Ren'Py)
+      - name: 2. Instalando o Java 21 (A Peça que Funcionou!)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21' # AQUI ESTÁ A MÁGICA: O Ren'Py pediu 21, nós damos 21!
+          java-version: '21'
 
       - name: 3. Preparando Hangar (Tela Virtual)
         run: |
           sudo apt-get update
-          # Tiramos o Java antigo daqui e deixamos só o simulador de tela
           sudo apt-get install -y unzip xvfb libglu1 libpulse0 libasound2
           echo "Hangar pronto."
 
@@ -31,14 +30,32 @@ jobs:
           unzip -q renpy-8.2.1-rapt.zip
           mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 5. Cuspindo Código (O SHOW DE VERDADE)
+      - name: 5. Criando a Identidade do APK (A Peça que Faltava)
+        run: |
+          # Isso cria o arquivo que o Ren'Py estava chorando para ter
+          cat <<EOF > android.json
+          {
+              "name": "Games Mais 18",
+              "icon_name": "Games Mais 18",
+              "package": "com.gam3smais18.mod",
+              "version": "1.0",
+              "numeric_version": 1,
+              "orientation": "sensorLandscape",
+              "update_keystore": false,
+              "google_play_key": "",
+              "google_play_salt": ""
+          }
+          EOF
+          echo "Identidade do Android criada com sucesso!"
+
+      - name: 6. Cuspindo Código (O APK VAI DESCER)
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
-          # O comando que funcionou perfeitamente, agora com o Java certo
+          # Como a identidade agora existe, o yes vai confirmar a licença e o APK vai nascer!
           yes | xvfb-run ./renpy_sdk/renpy.sh renpy_sdk/launcher android_build . --destination $GITHUB_WORKSPACE/build_output
 
-      - name: 6. Entrega da Carga
+      - name: 7. Entrega da Carga
         uses: actions/upload-artifact@v4
         with:
           name: APK_Final_G18
