@@ -1,53 +1,37 @@
-name: Forca_Bruta_G18_Final
+name: Gerador_APK_GamesMais18
 on: [push]
+
+env:
+  # Isso é crucial: desliga o Android padrão do GitHub para não dar conflito com o do Ren'Py
+  ANDROID_NDK_HOME: ""
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - name: 1. Sincronizando Arquivos do Mod
+      - name: 1. Pegando os arquivos do Mod
         uses: actions/checkout@v4
+        with:
+          path: projeto_g18 # Isola o seu jogo numa pasta limpa
 
-      - name: 2. Preparando Hangar (Dependências do Sistema)
-        run: |
-          sudo apt-get update
-          # Java 17 é o coração do Android; Xvfb simula o monitor pro Ren'Py não travar
-          sudo apt-get install -y unzip openjdk-17-jdk xvfb libglu1 libpulse0 libasound2 libgl1
-          echo "Hangar pronto."
+      - name: 2. Instalando o Java (Coração do Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: 3. Instalando Motor e RAPT (Ajuste de Pastas Blindado)
-        run: |
-          # Baixando o Ren'Py SDK 8.2.1
-          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
-          tar xf renpy-8.2.1-sdk.tar.bz2
-          mv renpy-8.2.1-sdk renpy_sdk
-          
-          # Baixando o RAPT (Ferramenta Android)
-          wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
-          unzip -q renpy-8.2.1-rapt.zip
-          
-          # Garantindo que a pasta se chame exatamente 'rapt' dentro do motor
-          mkdir -p renpy_sdk/rapt
-          cp -r renpy-8.2.1-rapt/* renpy_sdk/rapt/ || cp -r rapt/* renpy_sdk/rapt/
+      - name: 3. Construindo o APK (O Plugin Oficial)
+        uses: Ayowel/renpy-setup-action@v2.0.1
+        with:
+          action: android_build
+          install_dir: motor_renpy
+          game: projeto_g18
+          out_dir: build_output
+          android_sdk: true
+          android_sdk_owner: "GamesMais18"
 
-      - name: 4. Cuspindo Código (O COMANDO QUE NÃO ERRA)
-        run: |
-          mkdir -p build_output
-          chmod +x renpy_sdk/renpy.sh
-          
-          # EXPLICANDO O COMANDO:
-          # xvfb-run: Cria um monitor virtual
-          # ./renpy_sdk/renpy.sh: Chama o motor
-          # renpy_sdk/launcher: Aponta para a pasta real do launcher que baixamos
-          # android_build: Comando para gerar APK
-          # .: Diz que o seu jogo é a pasta atual
-          # --install-sdk: Aceita os termos da Google automaticamente
-          
-          xvfb-run ./renpy_sdk/renpy.sh renpy_sdk/launcher android_build . --install-sdk --destination $GITHUB_WORKSPACE/build_output
-
-      - name: 5. Entrega da Carga (Download do APK)
-        if: always()
+      - name: 4. Entrega da Carga
         uses: actions/upload-artifact@v4
         with:
           name: APK_GamesMais18_Final
-          path: build_output/*.apk
+          path: build_output
