@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_V10
+name: Forca_Bruta_G18_V11
 on: [push]
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
           unzip -q renpy-8.2.1-rapt.zip
           mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 5. Criando Identidade e Travando a Memória
+      - name: 5. Criando Identidade
         run: |
           cat <<EOF > android.json
           {
@@ -45,15 +45,12 @@ jobs:
               "google_play_salt": ""
           }
           EOF
-          
-          # AQUI ESTÁ A TRAVA: Forçando o Android do Ren'Py a usar no máximo 2GB
-          mkdir -p renpy_sdk/rapt/project
-          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" > renpy_sdk/rapt/project/gradle.properties
 
-      - name: 6. Cuspindo Código (ESTABILIZADO)
+      - name: 6. Cuspindo Código (MODO BLINDADO)
         env:
-          # Trava de segurança global do Java para 2GB
-          _JAVA_OPTIONS: "-Xmx2g"
+          # Isso PROÍBE o Android de criar os "daemons" (processos fantasmas que estouram a RAM)
+          # E limita o processo único a 2GB seguros.
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx2048m -XX:MaxMetaspaceSize=512m"
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
