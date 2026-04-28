@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_V7
+name: Forca_Bruta_G18_V8
 on: [push]
 
 jobs:
@@ -30,9 +30,8 @@ jobs:
           unzip -q renpy-8.2.1-rapt.zip
           mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 5. Criando a Identidade do APK (A Peça que Faltava)
+      - name: 5. Criando a Identidade do APK
         run: |
-          # Isso cria o arquivo que o Ren'Py estava chorando para ter
           cat <<EOF > android.json
           {
               "name": "Games Mais 18",
@@ -46,13 +45,15 @@ jobs:
               "google_play_salt": ""
           }
           EOF
-          echo "Identidade do Android criada com sucesso!"
 
-      - name: 6. Cuspindo Código (O APK VAI DESCER)
+      - name: 6. Cuspindo Código (COM NITRO DE MEMÓRIA)
+        env:
+          # Injetando 4GB de RAM para o Android não engasgar nos assets pesados
+          JAVA_TOOL_OPTIONS: "-Xmx4g"
+          GRADLE_OPTS: "-Xmx4g -Dorg.gradle.daemon=false"
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
-          # Como a identidade agora existe, o yes vai confirmar a licença e o APK vai nascer!
           yes | xvfb-run ./renpy_sdk/renpy.sh renpy_sdk/launcher android_build . --destination $GITHUB_WORKSPACE/build_output
 
       - name: 7. Entrega da Carga
