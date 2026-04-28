@@ -1,4 +1,4 @@
-name: Forca_Bruta_G18_V9
+name: Forca_Bruta_G18_V10
 on: [push]
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
           unzip -q renpy-8.2.1-rapt.zip
           mv renpy-8.2.1-rapt renpy_sdk/rapt || mv rapt renpy_sdk/rapt
 
-      - name: 5. Criando a Identidade do APK
+      - name: 5. Criando Identidade e Travando a Memória
         run: |
           cat <<EOF > android.json
           {
@@ -45,11 +45,15 @@ jobs:
               "google_play_salt": ""
           }
           EOF
+          
+          # AQUI ESTÁ A TRAVA: Forçando o Android do Ren'Py a usar no máximo 2GB
+          mkdir -p renpy_sdk/rapt/project
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" > renpy_sdk/rapt/project/gradle.properties
 
-      - name: 6. Cuspindo Código (MEDIDA CERTA DE MEMÓRIA)
+      - name: 6. Cuspindo Código (ESTABILIZADO)
         env:
-          # Apenas o Gradle (Android) recebe o limite de 3GB, sem desligar o servidor
-          GRADLE_OPTS: "-Xmx3g -Dorg.gradle.daemon=false"
+          # Trava de segurança global do Java para 2GB
+          _JAVA_OPTIONS: "-Xmx2g"
         run: |
           mkdir -p build_output
           chmod +x renpy_sdk/renpy.sh
