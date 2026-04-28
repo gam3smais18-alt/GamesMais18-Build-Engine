@@ -10,26 +10,26 @@ jobs:
 
       - name: 2. Preparando Hangar
         run: |
-          sudo apt-get update && sudo apt-get install -y unzip libglu1 libpulse0
+          # Instalando bibliotecas que o motor do Ren'Py usa para "pensar"
+          sudo apt-get update && sudo apt-get install -y unzip libglu1 libpulse0 libasound2
           echo "Hangar pronto."
 
       - name: 3. Instalando Motor e RAPT
         run: |
-          # Baixando SDK
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-sdk.tar.bz2
           tar xf renpy-8.2.1-sdk.tar.bz2
           mv renpy-8.2.1-sdk renpy_sdk
-          # Baixando RAPT
           wget -q https://www.renpy.org/dl/8.2.1/renpy-8.2.1-rapt.zip
           unzip -q renpy-8.2.1-rapt.zip
           mv rapt* renpy_sdk/rapt
 
-      - name: 4. Cuspindo Código (O SHOW COMEÇA AQUI)
+      - name: 4. Cuspindo Código (O SHOW COMEÇA AGORA)
         run: |
-          # Dando permissão de execução para o motor
+          # Criando a pasta de saída para não dar erro
+          mkdir -p build_output
+          # Dando permissão e rodando o comando no local certo (.)
           chmod +x renpy_sdk/renpy.sh
-          # Usando o lançador nativo para evitar erro de bibliotecas
-          ./renpy_sdk/renpy.sh launcher distribute . --destination build_output --platforms android
+          ./renpy_sdk/renpy.sh . distribute --destination build_output --platforms android
 
       - name: 5. Entrega da Carga
         uses: actions/upload-artifact@v4
